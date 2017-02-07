@@ -1,0 +1,3 @@
+[submodule "IntraNode_Opt_course"]
+	path = IntraNode_Opt_course
+	url = git@gitlab.hpc.cineca.it:training/IntraNode_Opt_course.git
