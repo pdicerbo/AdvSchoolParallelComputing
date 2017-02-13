@@ -1,0 +1,16 @@
+Exercise 2
+
+1) Compile "test.c" with the compiler (mpiicc) in the module intelmpi/2017--binary
+
+2) Check with:
+$ ldd <executable>
+the list of required dynamic libraries.
+
+3) Write "job.sh" (you can copy it from exercise 1), modifying the "select" line with the following requests:
+#PBS -l select=2:ncpus=16:mpiprocs=16:mem=3gb
+#PBS -l select=2:ncpus=16:mpiprocs=1:mem=3gb
+Run first 32 processes and then 2 processes for each select.
+
+Optional: if using Intelmpi (recommended), inside the job export the environment variable:
+I_MPI_DEBUG=5
+And see what information it prompts you on the standard error.
