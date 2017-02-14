@@ -1,0 +1,6 @@
+module load intel/pe-xe-2017--binary
+echo module load intel/pe-xe-2017--binary
+
+export OMP_DISPLAY_ENV=TRUE
+echo export OMP_DISPLAY_ENV=TRUE
+
