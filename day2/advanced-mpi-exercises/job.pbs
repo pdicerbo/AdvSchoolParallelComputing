@@ -1,9 +1,8 @@
 #!/bin/bash
-#PBS -N jacobi
+#PBS -N Jacobi
 #PBS -l select=1:ncpus=8:mpiprocs=8:mem=20Gb
-#PBS -l walltime=5:00
-#PBS -q R457635
-#PBS -A train_scA2017
+#PBS -l walltime=15:00
+#PBS -A train_scA2017_0
 
 cd $PBS_O_WORKDIR
 module load autoload intelmpi
@@ -12,7 +11,7 @@ NRep=10
 Count=1
 while [ $Count -le $NRep ]
 do
-    # mpirun -n 4 ./jacobi 500 500  | grep Terminated | awk '{print $8}' >> timing.dat
-    mpirun -n 4 ./a.out 500 500  | grep Terminated | awk '{print $8}' >> timing.dat
+    mpirun -n 4 ./jacobi 500 500  | grep Terminated | awk '{print $8}' >> timing.dat #PBS -q R457635
+    # mpirun -n 4 ./a.out 500 500  | grep Terminated | awk '{print $8}' >> timing.dat
     Count=$((Count+1))
 done
