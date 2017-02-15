@@ -7,7 +7,8 @@ Verify the speedup obtained when you compile with AVX flag.
 Env :
 
     module load autoload vtune python
-    source /marconi_scratch/userinternal/epascol1/adv_py_school/bin/activate
+    source /marconi_scratch/userinternal/epascol1/adv_py_school/bin/
+    export LD_LIBRARY_PATH= <WORKDIR> :$LD_LIBRARY_PATH
 
 Compilation :
 

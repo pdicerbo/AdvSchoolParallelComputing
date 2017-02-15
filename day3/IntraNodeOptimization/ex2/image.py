@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 def argument():
     parser = argparse.ArgumentParser(description = '''
-    Python test software to image library.
+    Python to test keramagic improvement.
     ''',
     formatter_class=argparse.RawTextHelpFormatter
     )
@@ -24,7 +24,7 @@ def argument():
                                 type = int,
                                 required = False,
                                 default = 0,
-                                choices=[0,1],
+                                choices=[0,1,2,3],
                                 help = 'Number of operation')
   
     return parser.parse_args()
