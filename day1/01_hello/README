@@ -1,0 +1,23 @@
+Exercise 1
+
+1) Write a job script with "walltime" of 3 minutes that asks for 1 node, 1 core and 128 GB of memory. Copy-paste the following in the execution section
+
+hostname
+echo 'Hello World'
+sleep 4
+
+Now add the automatic sending of the email in case of ending and abort of the job.
+
+2) Launch the job with qsub
+
+3) Check its state with qstat
+
+4) The job should start almost immediately, so why isn't it starting? Check with "qstat -f <jobid>" and use the MARCONI UserGuide (see link in the last slide) to spot the error
+
+5) Fix the script, delete the previous job with qdel and relaunch. 
+
+6) Check its state again with "qstat -f jobid"  after having increased the sleep to 60, namely:
+
+hostname
+echo 'Hello World'
+sleep 60

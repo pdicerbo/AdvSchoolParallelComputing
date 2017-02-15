@@ -1,0 +1,14 @@
+Exercise 4
+
+1) Compile "vector.f90"* with the compiler (mpiifort) in the module intelmpi/2017--binary. 
+For each rank, it does a sum of the elements of a large array and it prints the sum of some elements and the time spent in the loop. It's a good code for vector optimization.
+
+2) Load the module env-knl to switch to KNL environment, then submit the job asking for 1 node, 64 ncpus and 64 mpiprocs.
+
+3) Compile the code again by adding the -xMIC-AVX512 flag, then submit again. Compare the times obtained with those from the previous run.
+
+Optional: Experiment with the requests, by asking for flat memory mode and enabling hyperthreading (ncpus=64, mpiprocs=256). i
+Switch back to Broadwell environment and submit the job for the non-vector optimized executable. What simulation has the best time overall?
+
+*credits:
+http://www.nersc.gov/users/computational-systems/edison/programming/vectorization/#toc-anchor-2
