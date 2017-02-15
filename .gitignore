@@ -1,1 +1,4 @@
 a.out
+*.dat*
+jacobi
+output100-100

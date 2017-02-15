@@ -27,6 +27,11 @@ void initialise(double*, double*, int, int, int);
 
 int main(int argc, char * argv[]) {	
 	int size, myrank;
+	int ProcTop, ProcBottom;
+	int PrevLocalDim;
+
+	MPI_Win win;
+	MPI_Aint disp;
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -41,8 +46,10 @@ int main(int argc, char * argv[]) {
 
 	if (myrank==0) printf("Solving to accuracy of %.0e, global system size is x=%d y=%d\n", CONVERGENCE_ACCURACY, nx, ny);
 	int local_nx=nx/size;
+	PrevLocalDim = local_nx;
 	if (local_nx * size < nx) {
 		if (myrank < nx - local_nx * size) local_nx++;
+		if (myrank == nx - local_nx * size) PrevLocalDim++;
 	}
 
 	double * grid = malloc(sizeof(double) * (local_nx + 2) * ny);
@@ -50,8 +57,10 @@ int main(int argc, char * argv[]) {
 	double * temp = malloc(sizeof(double) * (local_nx + 2) * ny);
 	double start_time;
 
-        MPI_Win win;
-        MPI_Aint disp;
+	disp = ny*(local_nx + 2)*sizeof(double);
+	MPI_Win_create(grid, disp, sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
+	ProcTop = myrank==0 ? MPI_PROC_NULL : myrank-1;
+	ProcBottom = myrank==size-1 ? MPI_PROC_NULL : myrank+1;
 
 	initialise(grid, grid_new, local_nx, myrank, size);
 
@@ -70,6 +79,7 @@ int main(int argc, char * argv[]) {
 	start_time=MPI_Wtime();
 	for (k=0;k<MAX_ITERATIONS;k++) {
  
+		/*
 		if (myrank > 0) {
 			MPI_Isend(&grid[ny], ny, MPI_DOUBLE, myrank-1, 0, MPI_COMM_WORLD, &requests[0]);
 			MPI_Irecv(&grid[0], ny, MPI_DOUBLE, myrank-1, 0, MPI_COMM_WORLD, &requests[1]);
@@ -79,7 +89,20 @@ int main(int argc, char * argv[]) {
 			MPI_Irecv(&grid[(local_nx+1) * ny], ny, MPI_DOUBLE, myrank+1, 0, MPI_COMM_WORLD, &requests[3]);
 		}
 		MPI_Waitall(4, requests, MPI_STATUSES_IGNORE);
-		
+		*/
+
+		// MPI_Win_fence(MPI_MODE_NOPRECEDE, win);
+		MPI_Win_lock(MPI_LOCK_SHARED, ProcTop, MPI_MODE_NOCHECK, win);
+		disp = PrevLocalDim*ny;
+		MPI_Get(&grid[0],ny,MPI_DOUBLE,ProcTop,disp,ny,MPI_DOUBLE,win);
+		MPI_Win_unlock(ProcTop, win);
+
+		MPI_Win_lock(MPI_LOCK_SHARED, ProcBottom, MPI_MODE_NOCHECK, win);
+		disp = ny;
+		MPI_Get(&grid[(local_nx+1)*ny],ny,MPI_DOUBLE,ProcBottom,disp,ny,MPI_DOUBLE,win);
+		MPI_Win_unlock(ProcBottom, win);
+		// MPI_Win_fence(MPI_MODE_NOSUCCEED, win);
+
 		tmpnorm=0.0;
 		for (i=1;i<=local_nx;i++) {
 			for (j=0;j<ny;j++) {
