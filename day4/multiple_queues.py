@@ -27,6 +27,9 @@ if __name__ == '__main__':
     size = comm.Get_size()
     MyId = comm.Get_rank()
     # print("I am here: MyId=%d of %d" %(MyId, size))
+    
+    comm.Barrier()
+    t1 = time.time()
 
     inputs = input_files(input_dir)
     
@@ -37,16 +40,29 @@ if __name__ == '__main__':
     else:
         rest = len(inputs)%size
 
+    # the output of sort function is not
+    # guaranteed to be in order
+    inputs.sort()
+    
+    """
+    NICE ALTERNATIVE:
+    local_inputs = []
+    for i in range(MyId, len(inputs), size):
+        local_inputs.append(inputs[i])
+    """
+
     StartPoint = MyId*nfiles+rest
     EndPoint   = StartPoint + nfiles
     local_inputs = inputs[StartPoint:EndPoint]
 
-    if(MyId == 0):
-        print("Number of elaborations: {:d}".format(len(inputs)))
-
-    t1 = time.time()
     run(executable, local_inputs)
+    
+    t3 = time.time()
+    comm.Barrier()
     t2 = time.time()
 
-    print("Elapsed time {:5.2f}".format(t2-t1))
+    print("Process %d has %d files and employes %f" % (MyId, len(local_inputs), t3-t1))
+    
+    if(MyId == 0):
+        print("Elapsed time {:5.2f}".format(t2-t1))
     

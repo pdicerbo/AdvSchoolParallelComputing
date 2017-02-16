@@ -18,8 +18,8 @@ source env/bin/activate
 rm -f inputs/*.out
 
 #./single_queue.py serial_program.x inputs
-mpirun ./multiple_queues.py serial_program.x inputs
-#mpirun ./master_slave.py serial_program.x inputs
+# mpirun ./multiple_queues.py serial_program.x inputs
+mpirun ./MasterSlave.py serial_program.x inputs
 #./fault_tollerance.py mpi_program.x input.txt > out.txt 2> err.txt
 
 deactivate
