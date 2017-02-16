@@ -20,18 +20,17 @@ def run(executable, inputs):
            pid.wait()
 
 def master(inputs):
-    status = MPI.Status()
-
     for i in range(1,size):
         inp = inputs.pop()
         comm.send(inp, dest=i, tag=WORKTAG)
 
     while inputs:
-        im_free = comm.recv(source=MPI.ANY_SOURCE, tag=10, status=status)
+        im_free = comm.recv(source=MPI.ANY_SOURCE, tag=10)
         inp = inputs.pop()
         comm.send(inp, dest=im_free, tag=WORKTAG)
 
     for i in range(1,size):
+        im_free = comm.recv(source=i, tag=10)
         comm.send(obj=None, dest=i, tag=DIETAG)
 
 
