@@ -49,16 +49,20 @@ int main(int argc, char * argv[]) {
 	PrevLocalDim = local_nx;
 	if (local_nx * size < nx) {
 		if (myrank < nx - local_nx * size) local_nx++;
-		if (myrank == nx - local_nx * size) PrevLocalDim++;
+		// if (myrank == nx - local_nx * size) PrevLocalDim++;
 	}
+	if(myrank == nx%size)
+		PrevLocalDim++;
 
 	double * grid = malloc(sizeof(double) * (local_nx + 2) * ny);
 	double * grid_new = malloc(sizeof(double) * (local_nx + 2) * ny);
 	double * temp = malloc(sizeof(double) * (local_nx + 2) * ny);
 	double start_time;
 
-	disp = ny*(local_nx + 2)*sizeof(double);
-	MPI_Win_create(grid, disp, sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
+	disp = ny*local_nx*sizeof(double);
+	MPI_Win_create(&grid[ny], disp, sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
+	// disp = ny*(local_nx + 2)*sizeof(double);
+	// MPI_Win_create(grid, disp, sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
 	ProcTop = myrank==0 ? MPI_PROC_NULL : myrank-1;
 	ProcBottom = myrank==size-1 ? MPI_PROC_NULL : myrank+1;
 
@@ -91,17 +95,17 @@ int main(int argc, char * argv[]) {
 		MPI_Waitall(4, requests, MPI_STATUSES_IGNORE);
 		*/
 
-		// MPI_Win_fence(MPI_MODE_NOPRECEDE, win);
-		MPI_Win_lock(MPI_LOCK_SHARED, ProcTop, MPI_MODE_NOCHECK, win);
-		disp = PrevLocalDim*ny;
+		MPI_Win_fence(MPI_MODE_NOPRECEDE, win);
+		// MPI_Win_lock(MPI_LOCK_SHARED, ProcTop, MPI_MODE_NOCHECK, win);
+		disp = (PrevLocalDim-1)*ny;
 		MPI_Get(&grid[0],ny,MPI_DOUBLE,ProcTop,disp,ny,MPI_DOUBLE,win);
-		MPI_Win_unlock(ProcTop, win);
+		// MPI_Win_unlock(ProcTop, win);
 
-		MPI_Win_lock(MPI_LOCK_SHARED, ProcBottom, MPI_MODE_NOCHECK, win);
-		disp = ny;
+		// MPI_Win_lock(MPI_LOCK_SHARED, ProcBottom, MPI_MODE_NOCHECK, win);
+		disp = 0;
 		MPI_Get(&grid[(local_nx+1)*ny],ny,MPI_DOUBLE,ProcBottom,disp,ny,MPI_DOUBLE,win);
-		MPI_Win_unlock(ProcBottom, win);
-		// MPI_Win_fence(MPI_MODE_NOSUCCEED, win);
+		// MPI_Win_unlock(ProcBottom, win);
+		MPI_Win_fence(MPI_MODE_NOSUCCEED, win);
 
 		tmpnorm=0.0;
 		for (i=1;i<=local_nx;i++) {
