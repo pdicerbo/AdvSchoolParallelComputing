@@ -64,7 +64,7 @@ Launch the batch-script:
 
 Compile the MPI code:
 
-    mpicc -o mpi_programm.x mpi_program.x
+    mpicc -o mpi_programm.x mpi_program.c
 
 Edit the file fault_tollerance.py as explained by the teacher.
 
